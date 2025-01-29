@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <circle cx="30" cy="30" r="28" fill="url(#gradient)" stroke="rgba(0, 255, 255, 0.5)" stroke-width="2"/>
+  
+  <!-- Stylized "C" letter with rounder edges -->
+  <path d="M40 20H28C24.6863 20 22 22.6863 22 26V34C22 37.3137 24.6863 40 28 40H40" 
+        stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Decorative elements with cyan glow -->
+  <circle cx="40" cy="20" r="2.5" fill="#00ffff" filter="url(#glow)"/>
+  <circle cx="40" cy="40" r="2.5" fill="#00ffff" filter="url(#glow)"/>
+  
+  <!-- Gradient and filter definitions -->
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" style="stop-color:#2d2d2d"/>
+      <stop offset="100%" style="stop-color:#353535"/>
+    </linearGradient>
+    
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feFlood flood-color="#00ffff" flood-opacity="0.5"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg> 
