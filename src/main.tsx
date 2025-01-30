@@ -264,7 +264,7 @@ document.head.appendChild(style);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <Authenticator
         formFields={formFields}
         hideSignUp={false}

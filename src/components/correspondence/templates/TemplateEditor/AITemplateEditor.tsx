@@ -9,7 +9,7 @@ import {
   Grid,
   Autocomplete,
 } from '@mui/material';
-import { Predictions } from '@aws-amplify/predictions';
+import { Predictions } from '../../documents/AIProcessing/MockPredictions';
 
 interface TemplateField {
   name: string;

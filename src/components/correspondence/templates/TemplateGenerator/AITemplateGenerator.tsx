@@ -9,7 +9,7 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
-import { Predictions } from '@aws-amplify/predictions';
+import { Predictions } from '@components/correspondence/documents/AIProcessing/MockPredictions';
 
 interface CaseData {
   subject: {

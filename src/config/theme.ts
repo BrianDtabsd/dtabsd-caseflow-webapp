@@ -3,36 +3,59 @@ import { createTheme } from '@mui/material/styles';
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#52636C',     // Payne's gray - primary color
-      light: '#91a3ac',    // Payne's gray 700 - lighter version
-      dark: '#414f56',     // Payne's gray 400 - darker version
+      main: '#6366F1',    // Cosmic Indigo - for main actions and brand elements
+      light: '#818CF8',
+      dark: '#4F46E5',
     },
     secondary: {
-      main: '#9FB8B9',     // Ash gray - secondary color
-      light: '#c4d4d5',    // Ash gray 700
-      dark: '#769a9c',     // Ash gray 400
+      main: '#F472B6',    // Blossom Pink - for complementary highlights
+      light: '#F9A8D4',
+      dark: '#EC4899',
     },
-    action: {
-      active: '#48AFB1',   // Verdigris - bright action color
+    success: {
+      main: '#10B981',    // Mint Glow - for CTAs and hover states
     },
     text: {
-      primary: '#2A2F3A',  // Gunmetal - dark text
-      secondary: '#52636C', // Payne's gray - secondary text
+      primary: '#111827', // Midnight Gray - for main text
+      secondary: '#9CA3AF', // Foggy Gray - for secondary text
     },
     background: {
-      default: '#DAE0D7',  // Alabaster - background
-      paper: '#fff',
+      default: '#F3F4F6', // Cloud White - main backdrop
+      paper: '#FFFFFF',   // Pure white for cards/panels
     },
+    grey: {
+      300: '#9CA3AF',    // Foggy Gray - for borders and dividers
+    }
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          '&:active': {
-            boxShadow: '0 0 12px #48AFB1',  // Verdigris glow on press
+          textTransform: 'none',
+          borderRadius: '8px',
+          '&:hover': {
+            boxShadow: `0 0 12px #10B981`,  // Mint Glow effect
           }
         }
       }
-    }
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '& fieldset': {
+              borderColor: '#374151', // Darker grey for input borders
+            },
+            '&:hover fieldset': {
+              borderColor: '#111827', // Even darker on hover
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#6366F1', // Cosmic Indigo when focused
+            }
+          }
+        },
+      },
+    },
   }
 }); 
