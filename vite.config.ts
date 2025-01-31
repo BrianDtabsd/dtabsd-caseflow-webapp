@@ -11,26 +11,36 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: [
+    include: ['yup'],
+    exclude: [
+      '@aws-amplify/ui-react',
       '@aws-amplify/core',
       '@aws-amplify/auth',
       '@aws-amplify/api',
       '@aws-amplify/storage',
-      '@aws-amplify/ui-react'
+      '@aws-amplify/predictions',
+      '@aws-amplify/data-schema-types'
     ],
     esbuildOptions: {
       define: {
         global: 'globalThis'
+      },
+      platform: 'browser',
+      supported: {
+        'top-level-await': true
       }
     }
   },
   resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.json'],
     alias: {
       './runtimeConfig': './runtimeConfig.browser',
-      '@aws-amplify/data-schema-types': path.resolve(__dirname, 'node_modules/@aws-amplify/data-schema-types/lib-esm'),
       '@src': path.resolve(__dirname, 'src'),
       '@components': path.resolve(__dirname, 'src/components')
-    }
+    },
+    mainFields: ['browser', 'module', 'main'],
+    extensions: ['.js', '.mjs', '.ts', '.tsx', '.json']
+  },
+  ssr: {
+    noExternal: ['@aws-amplify/*']
   }
 })

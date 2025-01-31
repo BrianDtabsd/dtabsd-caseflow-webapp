@@ -24,6 +24,7 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", "amplify"],
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "amplify"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

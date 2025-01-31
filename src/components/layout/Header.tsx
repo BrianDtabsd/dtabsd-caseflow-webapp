@@ -16,16 +16,17 @@ import {
   Brightness4,
   Brightness7,
 } from '@mui/icons-material';
-import { useAuth } from '../../context/auth/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { AuthUser } from '@aws-amplify/auth';
 
 interface HeaderProps {
   onMenuClick: () => void;
+  onSignOut: () => void;
+  user: AuthUser;
 }
 
-export const Header = ({ onMenuClick }: HeaderProps) => {
+export const Header = ({ onMenuClick, onSignOut, user }: HeaderProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { user, logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
   const theme = useMuiTheme();
 
@@ -39,7 +40,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
 
   const handleLogout = async () => {
     handleClose();
-    await logout();
+    onSignOut();
   };
 
   return (

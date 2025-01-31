@@ -3,6 +3,7 @@ import { Box, useMediaQuery, useTheme } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Sidebar } from '../components/layout/Sidebar';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 
 const DRAWER_WIDTH = 280;
 
@@ -10,6 +11,7 @@ export const MainLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { signOut, user } = useAuthenticator((context) => [context.user]);
 
   const handleSidebarToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -17,7 +19,11 @@ export const MainLayout = () => {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <Header onMenuClick={handleSidebarToggle} />
+      <Header 
+        onMenuClick={handleSidebarToggle} 
+        onSignOut={signOut}
+        user={user}
+      />
       <Sidebar
         isOpen={!isMobile || isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}

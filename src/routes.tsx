@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { authStatus } = useAuthenticator((context) => [context.authStatus]);
 
   if (authStatus !== 'authenticated') {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;
@@ -26,7 +26,12 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      {/* No need for separate login/register routes as Amplify Authenticator handles that */}
+      <Route path="/login" element={
+        authStatus === 'authenticated' ? 
+          <Navigate to="/dashboard" replace /> : 
+          <Navigate to="/" replace />
+      } />
+      
       <Route
         element={
           <ProtectedRoute>
@@ -40,6 +45,7 @@ const AppRoutes = () => {
         <Route path="/employees/new" element={<EmployeeProfile onSubmit={(data) => console.log(data)} />} />
         <Route path="/employees/:id" element={<EmployeeProfile onSubmit={(data) => console.log(data)} />} />
       </Route>
+
       {/* Redirect root to dashboard if authenticated */}
       <Route
         path="/"
@@ -47,10 +53,11 @@ const AppRoutes = () => {
           authStatus === 'authenticated' ? (
             <Navigate to="/dashboard" replace />
           ) : (
-            <Navigate to="/" replace />
+            <Navigate to="/login" replace />
           )
         }
       />
+      
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
