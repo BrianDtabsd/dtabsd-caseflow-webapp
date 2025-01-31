@@ -1,30 +1,20 @@
 {
-  "auth": {
-    "dtabsdcaseflowwebapp409c9c22": {
-      "customAuth": false,
+  "api": {
+    "dtabsdcaseflowwebapp": {
       "dependsOn": [],
-      "frontendAuthConfig": {
-        "mfaConfiguration": "OFF",
-        "mfaTypes": [
-          "SMS"
-        ],
-        "passwordProtectionSettings": {
-          "passwordPolicyCharacters": [],
-          "passwordPolicyMinLength": 8
-        },
-        "signupAttributes": [
-          "EMAIL"
-        ],
-        "socialProviders": [],
-        "usernameAttributes": [
-          "EMAIL"
-        ],
-        "verificationMechanisms": [
-          "EMAIL"
-        ]
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [],
+          "defaultAuthentication": {
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 7
+            },
+            "authenticationType": "API_KEY"
+          }
+        }
       },
       "providerPlugin": "awscloudformation",
-      "service": "Cognito"
+      "service": "AppSync"
     }
   }
 }

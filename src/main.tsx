@@ -5,10 +5,18 @@ import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import App from "./App";
 import "./index.css";
-import config from './amplifyconfiguration.json';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 // Configure Amplify
-Amplify.configure(config);
+Amplify.configure({
+  Auth: {
+    Cognito: {
+      userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
+      userPoolClientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
+      signUpVerificationMethod: 'code'
+    }
+  }
+});
 
 // Add global styles
 const style = document.createElement('style');

@@ -1,13 +1,9 @@
 export type AmplifyDependentResourcesAttributes = {
-  "auth": {
-    "dtabsdcaseflowwebapp409c9c22": {
-      "AppClientID": "string",
-      "AppClientIDWeb": "string",
-      "IdentityPoolId": "string",
-      "IdentityPoolName": "string",
-      "UserPoolArn": "string",
-      "UserPoolId": "string",
-      "UserPoolName": "string"
+  "api": {
+    "dtabsdcaseflowwebapp": {
+      "GraphQLAPIEndpointOutput": "string",
+      "GraphQLAPIIdOutput": "string",
+      "GraphQLAPIKeyOutput": "string"
     }
   }
 }
