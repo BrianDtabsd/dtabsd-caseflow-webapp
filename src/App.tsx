@@ -1,22 +1,13 @@
-import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import AppRoutes from './routes';
-import '@aws-amplify/ui-react/styles.css';
+import { themeDark } from './config/themeDark';
+import { AuthForm } from './components/auth/AuthForm';
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-});
-
-const App: React.FC = () => {
+const App = () => {
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={themeDark}>
       <CssBaseline />
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <AuthForm />
     </ThemeProvider>
   );
 };

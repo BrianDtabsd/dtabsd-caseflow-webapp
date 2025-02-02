@@ -1,20 +1,21 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthenticator } from '@aws-amplify/ui-react';
 import { MainLayout } from './layouts/MainLayout';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import AssistantPage from './pages/assistant/AssistantPage';
 import { EmployeeProfile } from './components/profiles/EmployeeProfile';
 import { CorrespondencePage } from './pages/correspondence/CorrespondencePage';
+import { AuthForm } from './components/auth/AuthForm';
+import { useAuth } from './context/auth/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { authStatus } = useAuthenticator((context) => [context.authStatus]);
+  const { isAuthenticated } = useAuth();
 
-  if (authStatus !== 'authenticated') {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
@@ -22,14 +23,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 };
 
 const AppRoutes = () => {
-  const { authStatus } = useAuthenticator((context) => [context.authStatus]);
+  const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
       <Route path="/login" element={
-        authStatus === 'authenticated' ? 
+        isAuthenticated ? 
           <Navigate to="/dashboard" replace /> : 
-          <Navigate to="/" replace />
+          <AuthForm />
       } />
       
       <Route
@@ -46,11 +47,11 @@ const AppRoutes = () => {
         <Route path="/employees/:id" element={<EmployeeProfile onSubmit={(data) => console.log(data)} />} />
       </Route>
 
-      {/* Redirect root to dashboard if authenticated */}
+      {/* Redirect root to login if not authenticated */}
       <Route
         path="/"
         element={
-          authStatus === 'authenticated' ? (
+          isAuthenticated ? (
             <Navigate to="/dashboard" replace />
           ) : (
             <Navigate to="/login" replace />

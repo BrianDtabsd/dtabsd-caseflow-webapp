@@ -1,18 +1,22 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { Amplify } from 'aws-amplify';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { AuthProvider } from './context/auth/AuthContext';
+import { themeDark } from './config/themeDark';
+import AppRoutes from './routes';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Authenticator } from '@aws-amplify/ui-react';
-import '@aws-amplify/ui-react/styles.css';
-import App from "./App";
-import "./index.css";
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
 
 // Configure Amplify
 Amplify.configure({
   Auth: {
     Cognito: {
-      userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
-      userPoolClientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
+      userPoolId: 'us-east-2_fVZXoTuLW',
+      userPoolClientId: '4l2gnf11i48pq62guo250as6fu',
       signUpVerificationMethod: 'code'
     }
   }
@@ -32,10 +36,19 @@ document.head.appendChild(style);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Authenticator>
-      {({ signOut }) => (
-        <App />
-      )}
-    </Authenticator>
+    <BrowserRouter>
+      <AuthProvider>
+        <CustomThemeProvider>
+          <ThemeProvider theme={themeDark}>
+            <CssBaseline />
+            <ErrorBoundary>
+              <Authenticator.Provider>
+                <AppRoutes />
+              </Authenticator.Provider>
+            </ErrorBoundary>
+          </ThemeProvider>
+        </CustomThemeProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>
 );

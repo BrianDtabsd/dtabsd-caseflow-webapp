@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userData = await getCurrentUser();
       setUser(userData);
     } catch (error) {
+      console.error('Error getting current user:', error);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -57,15 +58,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
     } catch (error) {
       console.error('Error signing out:', error);
+      throw error;
     }
   }
 
   const value = {
     user,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !isLoading,
     isLoading,
     logout,
   };
+
+  if (isLoading) {
+    return null;
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
