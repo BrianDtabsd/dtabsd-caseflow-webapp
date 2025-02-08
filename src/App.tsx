@@ -1,15 +1,18 @@
 import { ThemeProvider } from '@mui/material/styles';
+import { BrowserRouter } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
-import { themeDark } from './config/themeDark';
-import { AuthForm } from './components/auth/AuthForm';
+import { theme } from './config/theme';
+import AppRoutes from './routes';
 
-const App = () => {
+function App() {
   return (
-    <ThemeProvider theme={themeDark}>
-      <CssBaseline />
-      <AuthForm />
-    </ThemeProvider>
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppRoutes />
+      </ThemeProvider>
+    </BrowserRouter>
   );
-};
+}
 
 export default App;

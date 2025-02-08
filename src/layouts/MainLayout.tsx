@@ -7,7 +7,11 @@ import { useAuthenticator, Authenticator } from '@aws-amplify/ui-react';
 
 const DRAWER_WIDTH = 280;
 
-export const MainLayout = () => {
+interface MainLayoutProps {
+  children: React.ReactNode;
+}
+
+export function MainLayout({ children }: MainLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -43,9 +47,9 @@ export const MainLayout = () => {
             minHeight: '100vh',
           }}
         >
-          <Outlet />
+          {children}
         </Box>
       </Box>
     </Authenticator.Provider>
   );
-}; 
+} 
