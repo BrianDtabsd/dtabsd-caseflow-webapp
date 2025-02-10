@@ -16,18 +16,29 @@ interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+<<<<<<< Updated upstream
 }
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
+=======
+  'aria-labelledby'?: string;
+}
+
+function TabPanel({ children, value, index, ...props }: TabPanelProps) {
+>>>>>>> Stashed changes
   return (
     <div
       role="tabpanel"
       hidden={value !== index}
       id={`case-tabpanel-${index}`}
       aria-labelledby={`case-tab-${index}`}
+<<<<<<< Updated upstream
       {...other}
+=======
+      {...props}
+>>>>>>> Stashed changes
     >
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
@@ -35,10 +46,18 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function CaseDetail() {
+<<<<<<< Updated upstream
   const { id } = useParams();
   const [tabValue, setTabValue] = useState(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+=======
+  const params = useParams<{ id: string }>();
+  const caseId = params.id;
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+>>>>>>> Stashed changes
     setTabValue(newValue);
   };
 
@@ -87,4 +106,8 @@ export default function CaseDetail() {
       </Box>
     </MainLayout>
   );
+<<<<<<< Updated upstream
 } 
+=======
+}
+>>>>>>> Stashed changes

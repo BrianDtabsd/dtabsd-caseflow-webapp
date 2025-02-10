@@ -1,4 +1,5 @@
 import { Box, TextField, Button, Typography } from '@mui/material';
+>>>>>>> Stashed changes
 
 export const LoginPage = () => {
   return (

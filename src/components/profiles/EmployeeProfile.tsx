@@ -12,9 +12,7 @@ import { createEmployee, updateEmployee } from '../../graphql/mutations/employee
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getEmployee } from '../../graphql/queries/employee';
-import { useAddressSearch } from '../../hooks/useAddressSearch';
-import debounce from 'lodash/debounce';
-import { UpdateEmployeeInput, CreateEmployeeInput } from '../../API';
+import { CreateEmployeeInput, UpdateEmployeeInput } from '../../types/API';
 
 interface EmployeeProfileProps {
   initialData?: Employee;
@@ -344,8 +342,14 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 fullWidth
                 options={addressSuggestions}
                 getOptionLabel={(option) => option.display_name || ''}
-                onInputChange={(_, value) => handleAddressSearch(value)}
-                onChange={handleAddressSelect}
+                onInputChange={(_event, value) => handleAddressSearch(value)}
+                onChange={(_event, value) => {
+                  if (value) {
+                    handleAddressSelect(value, _event);
+                  } else {
+                    handleAddressSelect(null, _event);
+                  }
+                }}
                 loading={isSearching}
                 renderInput={(params) => (
                   <MuiTextField
@@ -516,3 +520,11 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
     </FormProvider>
   );
 };
+function useAddressSearch(): { searchAddress: any; } {
+  throw new Error('Function not implemented.');
+}
+
+function debounce(_arg0: (searchText: string) => Promise<void>, _arg1: number) {
+  throw new Error('Function not implemented.');
+}
+

@@ -35,7 +35,7 @@ interface SidebarProps {
 const mainMenuItems = [
   { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
   { text: 'Cases', icon: <Description />, path: '/cases' },
-  { text: 'Clients', icon: <People />, path: '/clients' },
+  { text: 'Employers', icon: <People />, path: '/employers' },
   { text: 'Tasks', icon: <Assignment />, path: '/tasks' },
   { text: 'Reports', icon: <Assessment />, path: '/reports' },
   { text: '+ New Employee', icon: <PersonAddIcon />, path: '/employees/new' },

@@ -15,7 +15,10 @@ interface AddressResult {
 export const useAddressSearch = () => {
   const searchAddress = async (query: string) => {
     try {
+<<<<<<< Updated upstream
       // Add country filter for US and Canada
+=======
+>>>>>>> Stashed changes
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?` +
         `format=json` +
@@ -26,7 +29,11 @@ export const useAddressSearch = () => {
         {
           headers: {
             'Accept': 'application/json',
+<<<<<<< Updated upstream
             'User-Agent': 'DTABSD-Caseflow-WebApp'
+=======
+            'User-Agent': 'DTABSD-Caseflow-WebApp' // Your app name
+>>>>>>> Stashed changes
           }
         }
       );
@@ -39,4 +46,8 @@ export const useAddressSearch = () => {
   };
 
   return { searchAddress };
+<<<<<<< Updated upstream
 };
+=======
+}; 
+>>>>>>> Stashed changes

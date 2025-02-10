@@ -245,51 +245,48 @@ export const GRTWPlan = () => {
                             </Box>
                           </Box>
 
-Based on the lint error, it seems the `WeeklyScheduleView` component doesn't accept `week` and `totalTargetHours` as direct props, but rather expects them in a `data` object. Here's the corrected version:
-
+                          {/* Daily Schedule */}
                           {/* Daily Schedule */}
                           <Typography variant="subtitle2" sx={{ mt: 3, mb: 2 }}>
                             Daily Schedule
                           </Typography>
-                          <>
-                            {week.schedule.map((day) => (
-                              <Grid container spacing={2} key={day.day} sx={{ mb: 2 }}>
-                                <Grid item xs={12} sm={3}>
-                                  <Typography>{day.day}</Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={3}>
-                                  <ValidationTextField
-                                    name={`week${week.weekNumber}_${day.day}_start`}
-                                    label="Start Time"
-                                    type="time"
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    aria-label={`Start time for ${day.day}`}
-                                  />
-                                </Grid>
-                                <Grid item xs={12} sm={3}>
-                                  <ValidationTextField
-                                    name={`week${week.weekNumber}_${day.day}_end`}
-                                    label="End Time"
-                                    type="time"
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    aria-label={`End time for ${day.day}`}
-                                  />
-                                </Grid>
-                                <Grid item xs={12} sm={3}>
-                                  <ValidationTextField
-                                    name={`week${week.weekNumber}_${day.day}_hours`}
-                                    label="Hours"
-                                    type="number"
-                                    fullWidth
-                                    InputProps={{ inputProps: { min: 0, max: 8, step: 0.5 } }}
-                                    aria-label={`Hours worked on ${day.day}`}
-                                  />
-                                </Grid>
+                          {week.schedule.map((day) => (
+                            <Grid container spacing={2} key={day.day} sx={{ mb: 2 }}>
+                              <Grid item xs={12} sm={3}>
+                                <Typography>{day.day}</Typography>
                               </Grid>
-                            ))}
-                          </>
+                              <Grid item xs={12} sm={3}>
+                                <ValidationTextField
+                                  name={`week${week.weekNumber}_${day.day}_start`}
+                                  label="Start Time"
+                                  type="time"
+                                  fullWidth
+                                  InputLabelProps={{ shrink: true }}
+                                  aria-label={`Start time for ${day.day}`}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={3}>
+                                <ValidationTextField
+                                  name={`week${week.weekNumber}_${day.day}_end`}
+                                  label="End Time"
+                                  type="time"
+                                  fullWidth
+                                  InputLabelProps={{ shrink: true }}
+                                  aria-label={`End time for ${day.day}`}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={3}>
+                                <ValidationTextField
+                                  name={`week${week.weekNumber}_${day.day}_hours`}
+                                  label="Hours"
+                                  type="number"
+                                  fullWidth
+                                  InputProps={{ inputProps: { min: 0, max: 8, step: 0.5 } }}
+                                  aria-label={`Hours worked on ${day.day}`}
+                                />
+                              </Grid>
+                            </Grid>
+                          )}
 
                           <Typography variant="subtitle2" sx={{ mt: 3, mb: 2 }}>
                             Restrictions & Limitations
@@ -327,11 +324,9 @@ Based on the lint error, it seems the `WeeklyScheduleView` component doesn't acc
                             aria-label={`Modified duties for week ${week.weekNumber}`}
                           />
                           <WeeklyHoursBreakdown
-                            data={{
-                              week,
-                              regularHours: 40,
-                              showProgress: true
-                            }}
+                            week={week}
+                            regularHours={40}
+                            showProgress={true}
                           />
                         </Paper>
                       </DraggableWeek>
@@ -414,9 +409,11 @@ Based on the lint error, it seems the `WeeklyScheduleView` component doesn't acc
           {/* Plan Summary */}
           <Grid item xs={12}>
             <PlanSummary
-              weeks={weeks}
-              startDate={methods.getValues('startDate')}
-              endDate={methods.getValues('endDate')}
+              data={{
+                weeks,
+                startDate: methods.getValues('startDate'),
+                endDate: methods.getValues('endDate')
+              }}
             />
           </Grid>
 
@@ -437,7 +434,7 @@ Based on the lint error, it seems the `WeeklyScheduleView` component doesn't acc
 
         {/* Preview Dialog */}
         <PreviewDialog
-          isOpen={previewOpen}
+          open={previewOpen}
           onClose={() => setPreviewOpen(false)}
           data={{
             weeks,

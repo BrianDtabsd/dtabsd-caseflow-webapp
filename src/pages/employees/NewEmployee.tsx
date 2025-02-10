@@ -6,9 +6,17 @@ export const NewEmployee = () => {
     <Box sx={{ 
       p: 3,
       minHeight: '100vh',
+<<<<<<< Updated upstream
       bgcolor: '#16161e', // Even darker background
+=======
+      bgcolor: '#16161e',
+>>>>>>> Stashed changes
     }}>
       <EmployeeProfile />
     </Box>
   );
+<<<<<<< Updated upstream
 };
+=======
+}; 
+>>>>>>> Stashed changes

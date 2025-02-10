@@ -1,0 +1,1193 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+
+type Case @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  caseNumber: String!
+  title: String!
+  description: String
+  type: CaseType!
+  category: CaseCategory!
+  subCategory: String
+  status: CaseStatus!
+  priority: Priority
+  subject: Subject @belongsTo
+  employer: Employer @belongsTo
+  caseManager: CaseManager @belongsTo
+  rehabManager: RehabManager @belongsTo
+  documents: [Document] @hasMany
+  notes: [Note] @hasMany
+  medicalRecords: [MedicalRecord] @hasMany
+  employmentRecords: [EmploymentRecord] @hasMany
+  correspondence: [Correspondence] @hasMany
+  tasks: [Task] @hasMany
+  followUps: [FollowUp] @hasMany
+  serviceProviders: [ServiceProvider] @hasMany
+  rehabPlans: [RehabPlan] @hasMany
+  benefitCalculations: [BenefitCalculation] @hasMany
+  aiSummary: String
+  nextSteps: [String]
+  risks: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  dueDate: AWSDateTime
+  openedDate: AWSDateTime!
+  closedDate: AWSDateTime
+  reopenedDate: AWSDateTime
+  reopenReason: String
+  customFields: AWSJSON
+}
+
+type Client @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String
+  phone: String
+  address: Address
+  dateOfBirth: AWSDate
+  ssn: String
+  cases: [Case] @hasMany
+}
+
+type Address {
+  street: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  country: String!
+}
+
+type MedicalRecord @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  date: AWSDateTime!
+  provider: String!
+  primaryDiagnosis: Diagnosis! @hasOne
+  secondaryDiagnoses: [Diagnosis] @hasMany
+  treatmentPlan: TreatmentPlan @hasOne
+  notes: String
+  attachments: [Document] @hasMany
+  caseID: ID!
+  case: Case @belongsTo
+}
+
+type Diagnosis @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  condition: String!
+  icd10Code: String
+  diagnosisDate: AWSDateTime!
+  diagnosedBy: String!
+  status: DiagnosisStatus!
+  prognosis: String
+  notes: String
+  medicalRecordID: ID!
+  medicalRecord: MedicalRecord @belongsTo
+}
+
+type TreatmentPlan @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  startDate: AWSDateTime!
+  endDate: AWSDateTime
+  description: String!
+  goals: [String]!
+  status: TreatmentStatus!
+  restrictions: [String]
+  medicalRecordID: ID!
+  medicalRecord: MedicalRecord @belongsTo
+}
+
+type EmploymentRecord @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  employer: String!
+  position: String!
+  startDate: AWSDate!
+  endDate: AWSDate
+  status: EmploymentStatus!
+  workSchedule: WorkSchedule
+  salary: Float
+  benefits: [BenefitPlan] @hasMany
+  rtwPlan: RTWPlan @hasOne
+  caseID: ID!
+  case: Case @belongsTo
+}
+
+type WorkSchedule {
+  hoursPerWeek: Float!
+  daysPerWeek: Int!
+  shifts: [String]
+}
+
+type RTWPlan @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  startDate: AWSDateTime!
+  endDate: AWSDateTime
+  restrictions: [WorkRestriction] @hasMany
+  accommodations: [String]
+  status: RTWStatus!
+  employmentRecordID: ID!
+  employmentRecord: EmploymentRecord @belongsTo
+}
+
+type WorkRestriction @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  type: RestrictionType!
+  description: String!
+  startDate: AWSDateTime!
+  endDate: AWSDateTime
+  status: RestrictionStatus!
+  rtwPlanID: ID!
+  rtwPlan: RTWPlan @belongsTo
+}
+
+type Document @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  title: String!
+  description: String
+  fileKey: String!
+  fileType: String!
+  category: DocumentCategory!
+  uploadedBy: String!
+  uploadedAt: AWSDateTime!
+  caseID: ID!
+  case: Case @belongsTo
+  tags: [String]
+  aiAnalysis: AIAnalysis @hasOne
+  accessibilityFeatures: [String]
+  ocrText: String
+  metadata: AWSJSON
+}
+
+type Correspondence @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  type: CorrespondenceType!
+  subject: String!
+  content: String!
+  sender: String!
+  recipient: String!
+  dateSent: AWSDateTime!
+  attachments: [Document] @hasMany
+  caseID: ID!
+  case: Case @belongsTo
+}
+
+type Task @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  title: String!
+  description: String
+  dueDate: AWSDateTime
+  priority: Priority!
+  status: TaskStatus!
+  assignedTo: String
+  caseID: ID!
+  case: Case @belongsTo
+  createdBy: String!
+  createdAt: AWSDateTime!
+  completedAt: AWSDateTime
+  notes: [Note] @hasMany
+  parentTaskID: ID
+  parentTask: Task @belongsTo
+  subtasks: [Task] @hasMany
+  workflowRuleID: ID
+  workflowRule: WorkflowRule @belongsTo
+}
+
+type Note @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  content: String!
+  createdBy: String!
+  createdAt: AWSDateTime!
+  category: NoteCategory
+  caseID: ID!
+  case: Case @belongsTo
+}
+
+type AIAnalysis @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  documentID: ID!
+  document: Document @belongsTo
+  summary: String
+  keyPoints: [String]
+  sentiment: String
+  entities: [Entity] @hasMany
+  categories: [String]
+  recommendations: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Entity @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  type: EntityType!
+  confidence: Float
+  analysisID: ID!
+  analysis: AIAnalysis @belongsTo
+}
+
+type ServiceProvider @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  type: ProviderType!
+  specialization: String
+  contact: Contact!
+  address: Address
+  cases: [Case] @hasMany
+  ratings: Float
+  notes: String
+}
+
+type Contact {
+  email: String
+  phone: String
+  alternatePhone: String
+  fax: String
+}
+
+type BenefitPlan @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  type: BenefitType!
+  provider: String!
+  policyNumber: String
+  coverage: [Coverage] @hasMany
+  startDate: AWSDate!
+  endDate: AWSDate
+  employmentRecordID: ID!
+  employmentRecord: EmploymentRecord @belongsTo
+}
+
+type Coverage {
+  type: CoverageType!
+  amount: Float!
+  percentage: Float
+  details: String
+}
+
+type RehabPlan @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  startDate: AWSDateTime!
+  endDate: AWSDateTime
+  goals: [String]!
+  interventions: [String]!
+  provider: ServiceProvider @belongsTo
+  status: RehabStatus!
+  budget: Budget
+  progress: [ProgressNote] @hasMany
+  caseID: ID!
+  case: Case @belongsTo
+}
+
+type Budget {
+  total: Float!
+  allocated: Float!
+  remaining: Float!
+  currency: String!
+  items: [BudgetItem] @hasMany
+}
+
+type BudgetItem @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  description: String!
+  amount: Float!
+  category: BudgetCategory!
+  date: AWSDateTime!
+  status: BudgetItemStatus!
+  budgetID: ID!
+  budget: Budget @belongsTo
+}
+
+type ProgressNote @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  date: AWSDateTime!
+  content: String!
+  metrics: [String]
+  nextSteps: [String]
+  rehabPlanID: ID!
+  rehabPlan: RehabPlan @belongsTo
+}
+
+type Template @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  type: TemplateType!
+  content: String!
+  variables: [String]
+  category: String
+  tags: [String]
+  lastUsed: AWSDateTime
+  createdBy: String!
+}
+
+type Subject @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  dateOfBirth: AWSDate
+  ssn: String
+  contact: Contact
+  address: Address
+  employmentHistory: [EmploymentRecord] @hasMany
+  cases: [Case] @hasMany
+  medicalHistory: [MedicalRecord] @hasMany
+  benefitPlans: [BenefitPlan] @hasMany
+  documents: [Document] @hasMany
+}
+
+type Employer @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  type: String
+  industry: String
+  locations: [Location] @hasMany
+  departments: [Department] @hasMany
+  contacts: [EmployerContact] @hasMany
+  employees: [Employee] @hasMany
+  cases: [Case] @hasMany
+  documents: [Document] @hasMany
+}
+
+type Location @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  type: LocationType!
+  address: Address!
+  departments: [Department] @hasMany
+  employerID: ID!
+  employer: Employer @belongsTo
+}
+
+type Department @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  code: String
+  locationID: ID!
+  location: Location @belongsTo
+  employerID: ID!
+  employer: Employer @belongsTo
+  employees: [Employee] @hasMany
+}
+
+type Employee @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  employeeId: String!
+  personalInfo: PersonalInfo @hasOne
+  employmentHistory: [EmploymentHistory] @hasMany
+  workSchedules: [WorkSchedule] @hasMany
+  cases: [Case] @hasMany
+  departmentID: ID!
+  department: Department @belongsTo
+  employerID: ID!
+  employer: Employer @belongsTo
+  jobInfo: JobInfo @hasOne
+  status: EmploymentStatus!
+  hireDate: AWSDate!
+  terminationDate: AWSDate
+  yearsOfService: Float
+  isUnionMember: Boolean
+  unionName: String
+  unionLocalNumber: String
+  benefitEligibilityDate: AWSDate
+  currentAccommodations: [String]
+}
+
+type EmployerContact @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  type: ContactType!
+  role: String!
+  contact: Contact!
+  employerID: ID!
+  employer: Employer @belongsTo
+}
+
+type JobInfo @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  title: String!
+  description: String
+  physicalDemands: [PhysicalDemand] @hasMany
+  schedule: WorkSchedule
+  location: Location @belongsTo
+  department: Department @belongsTo
+  employeeID: ID!
+  employee: Employee @belongsTo
+}
+
+type PhysicalDemand @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  type: DemandType!
+  frequency: Frequency!
+  description: String!
+  measurement: String
+  jobInfoID: ID!
+  jobInfo: JobInfo @belongsTo
+}
+
+type CaseManager @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  userId: String!
+  firstName: String!
+  lastName: String!
+  contact: Contact!
+  authorizationLevel: AuthLevel!
+  specialization: [String]
+  assignedCases: [Case] @hasMany
+  status: UserStatus!
+}
+
+type RehabManager @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  userId: String!
+  firstName: String!
+  lastName: String!
+  contact: Contact!
+  authorizationLevel: AuthLevel!
+  specialization: [String]
+  assignedCases: [Case] @hasMany
+  status: UserStatus!
+  serviceProviders: [ServiceProvider] @hasMany
+}
+
+type Payment @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  amount: Float!
+  type: PaymentType!
+  status: PaymentStatus!
+  date: AWSDateTime!
+  period: DateRange
+  benefitPlanID: ID!
+  benefitPlan: BenefitPlan @belongsTo
+  approvedBy: String
+  notes: String
+}
+
+type DateRange {
+  startDate: AWSDateTime!
+  endDate: AWSDateTime!
+}
+
+type FollowUp @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  type: FollowUpType!
+  reason: FollowUpReason!
+  description: String
+  dueDate: AWSDateTime!
+  status: FollowUpStatus!
+  priority: Priority!
+  assignedTo: String!
+  reassignedTo: String
+  reassignedReason: String
+  notes: String
+  caseID: ID!
+  case: Case @belongsTo
+  createdBy: String!
+  createdAt: AWSDateTime!
+  completedAt: AWSDateTime
+  completedBy: String
+  outcome: String
+  nextFollowUp: FollowUp @hasOne
+  previousFollowUp: FollowUp @belongsTo
+  sequence: Int
+  sequenceTotal: Int
+  isLastInSequence: Boolean
+  rule: FollowUpRule @belongsTo
+  notificationsSent: [NotificationLog] @hasMany
+  documents: [Document] @hasMany
+  relatedTasks: [Task] @hasMany
+  color: String
+  displayOrder: Int
+}
+
+type FollowUpRule @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  description: String
+  reason: FollowUpReason!
+  sequence: [FollowUpSequence!]!
+  isActive: Boolean!
+  createdBy: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime
+  category: String
+  applicableCaseTypes: [CaseType!]
+}
+
+type FollowUpSequence {
+  order: Int!
+  daysFromPrevious: Int!
+  type: FollowUpType!
+  description: String!
+  requiredActions: [String]
+  autoComplete: Boolean
+  escalateAfterDays: Int
+  notifyAfterDays: Int
+}
+
+enum CaseType {
+  ILLNESS
+  INJURY
+  WORKPLACE_INJURY
+  EARLY_INTERVENTION
+  PARENTAL_LEAVE
+  MEDICAL_LEAVE
+  PERSONAL_LEAVE
+  LONG_TERM_DISABILITY
+  SHORT_TERM_DISABILITY
+  WORKERS_COMPENSATION
+  ACCOMMODATION
+  RETURN_TO_WORK
+  PERFORMANCE_MANAGEMENT
+  GRIEVANCE
+  INVESTIGATION
+  OTHER
+}
+
+enum CaseStatus {
+  NEW
+  IN_PROGRESS
+  ON_HOLD
+  PENDING_REVIEW
+  CLOSED
+  ARCHIVED
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum CaseCategory {
+  WORKERS_COMP
+  DISABILITY
+  PERSONAL_INJURY
+  MEDICAL_LEAVE
+  OTHER
+}
+
+enum DiagnosisStatus {
+  ACTIVE
+  RESOLVED
+  CHRONIC
+  PENDING
+}
+
+enum TreatmentStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  DISCONTINUED
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+  RETIRED
+}
+
+enum RTWStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  DISCONTINUED
+}
+
+enum RestrictionType {
+  LIFTING
+  STANDING
+  SITTING
+  BENDING
+  REACHING
+  OTHER
+}
+
+enum RestrictionStatus {
+  ACTIVE
+  MODIFIED
+  EXPIRED
+  REMOVED
+}
+
+enum DocumentCategory {
+  MEDICAL
+  LEGAL
+  EMPLOYMENT
+  CORRESPONDENCE
+  PERSONAL
+  OTHER
+}
+
+enum CorrespondenceType {
+  EMAIL
+  LETTER
+  PHONE
+  MEETING
+  OTHER
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+  CANCELLED
+}
+
+enum NoteCategory {
+  GENERAL
+  MEDICAL
+  LEGAL
+  EMPLOYMENT
+  CLIENT_COMMUNICATION
+}
+
+enum EntityType {
+  PERSON
+  ORGANIZATION
+  LOCATION
+  DATE
+  MEDICAL_CONDITION
+  MEDICATION
+  TREATMENT
+  OTHER
+}
+
+enum ProviderType {
+  MEDICAL
+  REHAB
+  LEGAL
+  INSURANCE
+  EMPLOYER
+  OTHER
+}
+
+enum BenefitType {
+  HEALTH
+  DENTAL
+  VISION
+  DISABILITY
+  LIFE
+  PENSION
+  OTHER
+}
+
+enum CoverageType {
+  MEDICAL
+  PRESCRIPTION
+  THERAPY
+  EQUIPMENT
+  WAGE_REPLACEMENT
+  OTHER
+}
+
+enum RehabStatus {
+  PLANNED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  DISCONTINUED
+}
+
+enum BudgetCategory {
+  MEDICAL
+  THERAPY
+  EQUIPMENT
+  TRANSPORTATION
+  TRAINING
+  OTHER
+}
+
+enum BudgetItemStatus {
+  PLANNED
+  APPROVED
+  SPENT
+  CANCELLED
+}
+
+enum TemplateType {
+  LETTER
+  EMAIL
+  REPORT
+  FORM
+  AGREEMENT
+  OTHER
+}
+
+enum LocationType {
+  HEADQUARTERS
+  BRANCH
+  PLANT
+  WAREHOUSE
+  OFFICE
+  OTHER
+}
+
+enum ContactType {
+  HR
+  PAYROLL
+  CONSULTANT
+  SUPERVISOR
+  OTHER
+}
+
+enum DemandType {
+  LIFTING
+  CARRYING
+  PUSHING
+  PULLING
+  SITTING
+  STANDING
+  WALKING
+  CLIMBING
+  BENDING
+  REACHING
+  OTHER
+}
+
+enum Frequency {
+  NEVER
+  OCCASIONALLY
+  FREQUENTLY
+  CONSTANTLY
+}
+
+enum AuthLevel {
+  ADMIN
+  MANAGER
+  SUPERVISOR
+  STANDARD
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum PaymentType {
+  REGULAR
+  TOP_UP
+  PARTIAL
+  BONUS
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  PROCESSED
+  CANCELLED
+}
+
+enum FollowUpType {
+  MEDICAL
+  REHAB
+  RTW
+  ADMINISTRATIVE
+  OTHER
+}
+
+enum FollowUpReason {
+  MEDICAL_FORM_PENDING
+  MEDICAL_FORM_REVIEW
+  MEDICAL_UPDATE_REQUIRED
+  RTW_PLANNING
+  ACCOMMODATION_REVIEW
+  BENEFIT_UPDATE
+  CASE_REVIEW
+  DOCUMENT_REVIEW
+  EMPLOYEE_CHECK_IN
+  EMPLOYER_CHECK_IN
+  PROVIDER_UPDATE
+  COMPLIANCE_CHECK
+  OTHER
+}
+
+enum FollowUpStatus {
+  PENDING
+  IN_PROGRESS
+  DUE_TODAY
+  OVERDUE
+  URGENT
+  COMPLETED
+  CANCELLED
+  ESCALATED
+  REASSIGNED
+}
+
+type BenefitCalculation @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  type: CalculationType!
+  amount: Float!
+  startDate: AWSDateTime!
+  endDate: AWSDateTime
+  status: CalculationStatus!
+  parameters: AWSJSON
+  caseID: ID!
+  case: Case @belongsTo
+  createdBy: String!
+  approvedBy: String
+}
+
+enum CalculationType {
+  CASCADE
+  TOP_UP
+  PARTIAL_EARNINGS
+  OTHER
+}
+
+enum CalculationStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+type PersonalInfo @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  middleName: String
+  dateOfBirth: AWSDate!
+  ssn: String
+  gender: String
+  maritalStatus: String
+  nationality: String
+  preferredLanguage: String
+  contacts: [ContactInfo] @hasMany
+  addresses: [Address] @hasMany
+  emergencyContacts: [EmergencyContact] @hasMany
+  employee: Employee @belongsTo
+}
+
+type ContactInfo @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  type: ContactType!
+  value: String!
+  isPrimary: Boolean!
+  isVerified: Boolean
+  verifiedAt: AWSDateTime
+  personalInfoID: ID!
+  personalInfo: PersonalInfo @belongsTo
+}
+
+type EmergencyContact @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  relationship: String!
+  contacts: [ContactInfo] @hasMany
+  address: Address
+  personalInfoID: ID!
+  personalInfo: PersonalInfo @belongsTo
+}
+
+type EmploymentHistory @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  employeeID: ID!
+  employee: Employee @belongsTo
+  position: String!
+  department: String
+  location: String
+  startDate: AWSDate!
+  endDate: AWSDate
+  salary: Float
+  reasonForLeaving: String
+  isCurrent: Boolean!
+  supervisorName: String
+  supervisorContact: ContactInfo @hasOne
+}
+
+type WorkSchedule @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  employeeID: ID!
+  employee: Employee @belongsTo
+  scheduleType: ScheduleType!
+  hoursPerWeek: Float!
+  daysPerWeek: Int!
+  regularShift: Boolean!
+  shiftStart: AWSTime
+  shiftEnd: AWSTime
+  rotatingShift: Boolean
+  variableHours: Boolean
+  daysOff: [String]
+  effectiveDate: AWSDate!
+  endDate: AWSDate
+}
+
+enum ScheduleType {
+  FULL_TIME
+  PART_TIME
+  CASUAL
+  SEASONAL
+  CONTRACT
+}
+
+type WorkflowRule @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  description: String
+  triggerEvent: TriggerEvent!
+  conditions: [WorkflowCondition] @hasMany
+  actions: [WorkflowAction] @hasMany
+  priority: Priority!
+  isActive: Boolean!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type WorkflowCondition @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  field: String!
+  operator: ConditionOperator!
+  value: String!
+  workflowRuleID: ID!
+  workflowRule: WorkflowRule @belongsTo
+}
+
+type WorkflowAction @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  actionType: ActionType!
+  parameters: AWSJSON
+  workflowRuleID: ID!
+  workflowRule: WorkflowRule @belongsTo
+}
+
+type CaseEvent @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  caseID: ID!
+  case: Case @belongsTo
+  eventType: EventType!
+  description: String!
+  timestamp: AWSDateTime!
+  createdBy: String!
+  metadata: AWSJSON
+  triggeredWorkflows: [WorkflowRule] @hasMany
+}
+
+enum TriggerEvent {
+  CASE_CREATED
+  CASE_UPDATED
+  DOCUMENT_UPLOADED
+  TASK_COMPLETED
+  MEDICAL_UPDATE
+  RTW_STATUS_CHANGE
+  DEADLINE_APPROACHING
+  FOLLOW_UP_DUE
+}
+
+enum ConditionOperator {
+  EQUALS
+  NOT_EQUALS
+  CONTAINS
+  NOT_CONTAINS
+  GREATER_THAN
+  LESS_THAN
+  IN
+  NOT_IN
+}
+
+enum ActionType {
+  CREATE_TASK
+  SEND_NOTIFICATION
+  UPDATE_CASE_STATUS
+  GENERATE_DOCUMENT
+  SCHEDULE_FOLLOW_UP
+  ASSIGN_CASE_MANAGER
+  REQUEST_INFORMATION
+}
+
+enum EventType {
+  CASE_STATUS_CHANGE
+  DOCUMENT_ADDED
+  TASK_CREATED
+  TASK_COMPLETED
+  MEDICAL_UPDATE
+  RTW_UPDATE
+  FOLLOW_UP_SCHEDULED
+  NOTE_ADDED
+  WORKFLOW_TRIGGERED
+}
+
+type Dashboard @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  owner: String!
+  layout: AWSJSON
+  widgets: [DashboardWidget] @hasMany
+  filters: AWSJSON
+  permissions: [DashboardPermission] @hasMany
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type DashboardWidget @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  type: WidgetType!
+  title: String!
+  configuration: AWSJSON!
+  position: Position!
+  dashboardID: ID!
+  dashboard: Dashboard @belongsTo
+  reportID: ID
+  report: Report @belongsTo
+}
+
+type Position {
+  x: Int!
+  y: Int!
+  width: Int!
+  height: Int!
+}
+
+type DashboardPermission @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  dashboardID: ID!
+  dashboard: Dashboard @belongsTo
+  userID: String!
+  permission: PermissionLevel!
+}
+
+type Report @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  description: String
+  type: ReportType!
+  query: AWSJSON!
+  schedule: ReportSchedule
+  lastRun: AWSDateTime
+  createdBy: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  parameters: AWSJSON
+  visualization: VisualizationType
+  permissions: [ReportPermission] @hasMany
+  tags: [String]
+}
+
+type ReportPermission @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  reportID: ID!
+  report: Report @belongsTo
+  userID: String!
+  permission: PermissionLevel!
+}
+
+type ReportSchedule {
+  frequency: ScheduleFrequency!
+  timeOfDay: AWSTime
+  dayOfWeek: Int
+  dayOfMonth: Int
+  recipients: [String]!
+  nextScheduledRun: AWSDateTime
+}
+
+type Reminder @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  title: String!
+  description: String
+  type: ReminderType!
+  dueDate: AWSDateTime!
+  priority: Priority!
+  status: ReminderStatus!
+  assignedTo: String!
+  caseID: ID!
+  case: Case @belongsTo
+  followUpID: ID
+  followUp: FollowUp @belongsTo
+  taskID: ID
+  task: Task @belongsTo
+  createdBy: String!
+  createdAt: AWSDateTime!
+  notificationsSent: [NotificationLog] @hasMany
+  snoozeCount: Int
+  snoozeUntil: AWSDateTime
+}
+
+type NotificationLog @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  type: NotificationType!
+  recipient: String!
+  sentAt: AWSDateTime!
+  status: NotificationStatus!
+  reminderID: ID!
+  reminder: Reminder @belongsTo
+}
+
+enum WidgetType {
+  CASE_METRICS
+  TASK_SUMMARY
+  TIMELINE
+  CALENDAR
+  CHART
+  TABLE
+  KPI
+  ALERT
+  FOLLOW_UP_LIST
+  FOLLOW_UP_CALENDAR
+}
+
+enum PermissionLevel {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum ReportType {
+  CASE_SUMMARY
+  TASK_ANALYSIS
+  WORKFLOW_METRICS
+  PERFORMANCE_METRICS
+  FINANCIAL_SUMMARY
+  CUSTOM
+}
+
+enum VisualizationType {
+  BAR_CHART
+  LINE_CHART
+  PIE_CHART
+  TABLE
+  SCORECARD
+  HEAT_MAP
+  SCATTER_PLOT
+}
+
+enum ScheduleFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+}
+
+enum ReminderType {
+  FOLLOW_UP
+  TASK_DUE
+  APPOINTMENT
+  DOCUMENT_REVIEW
+  CUSTOM
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  ACKNOWLEDGED
+  SNOOZED
+  COMPLETED
+  CANCELLED
+}
+
+enum NotificationType {
+  EMAIL
+  SMS
+  IN_APP
+  PUSH
+}
+
+enum NotificationStatus {
+  SENT
+  DELIVERED
+  FAILED
+  READ
+}
