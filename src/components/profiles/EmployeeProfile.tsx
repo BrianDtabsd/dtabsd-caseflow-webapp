@@ -1,16 +1,18 @@
-import { Paper, Grid, Typography, Box, Button } from '@mui/material';
+import { 
+  Paper, Grid, Typography, Box, Button, Autocomplete, TextField as MuiTextField 
+} from '@mui/material';
 import { useForm, FormProvider } from 'react-hook-form';
 import { ValidationTextField } from '../common/FormValidation/ValidationTextField';
 import { SelectField } from '../common/SelectField';
 import { Employee } from '../../types/profiles';
 import { validationRules } from '../../utils/validationRules';
 import { employeeTableConfig } from '../../types/tableConfigs';
-import { generateClient } from 'aws-amplify/api';
+import { generateClient, GraphQLResult } from 'aws-amplify/api';
 import { createEmployee, updateEmployee } from '../../graphql/mutations/employee';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getEmployee } from '../../graphql/queries/employee';
-import { CreateEmployeeInput, UpdateEmployeeInput, GetEmployeeQuery, CreateEmployeeMutation, UpdateEmployeeMutation } from '../../API';
+import { CreateEmployeeInput, UpdateEmployeeInput } from '../../types/API';
 
 interface EmployeeProfileProps {
   initialData?: Employee;
@@ -18,6 +20,103 @@ interface EmployeeProfileProps {
 }
 
 const client = generateClient();
+
+const darkFieldStyle = {
+  '& .MuiOutlinedInput-root': {
+    background: 'rgba(255, 255, 255, 0.05)',
+    '& fieldset': {
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+    },
+    '&:hover fieldset': {
+      borderColor: '#48AFB1',
+      boxShadow: '0 0 5px rgba(72, 175, 177, 0.2)',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#ff79c6',
+      boxShadow: '0 0 10px rgba(255, 121, 198, 0.4)',
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  '& .MuiInputBase-input': {
+    color: '#FFFFFF',
+  },
+  '& .MuiSelect-select': {
+    color: '#FFFFFF',
+  },
+};
+
+// Add complete list of states
+const states = [
+  { value: 'AL', label: 'Alabama' },
+  { value: 'AK', label: 'Alaska' },
+  { value: 'AZ', label: 'Arizona' },
+  { value: 'AR', label: 'Arkansas' },
+  { value: 'CA', label: 'California' },
+  { value: 'CO', label: 'Colorado' },
+  { value: 'CT', label: 'Connecticut' },
+  { value: 'DE', label: 'Delaware' },
+  { value: 'FL', label: 'Florida' },
+  { value: 'GA', label: 'Georgia' },
+  { value: 'HI', label: 'Hawaii' },
+  { value: 'ID', label: 'Idaho' },
+  { value: 'IL', label: 'Illinois' },
+  { value: 'IN', label: 'Indiana' },
+  { value: 'IA', label: 'Iowa' },
+  { value: 'KS', label: 'Kansas' },
+  { value: 'KY', label: 'Kentucky' },
+  { value: 'LA', label: 'Louisiana' },
+  { value: 'ME', label: 'Maine' },
+  { value: 'MD', label: 'Maryland' },
+  { value: 'MA', label: 'Massachusetts' },
+  { value: 'MI', label: 'Michigan' },
+  { value: 'MN', label: 'Minnesota' },
+  { value: 'MS', label: 'Mississippi' },
+  { value: 'MO', label: 'Missouri' },
+  { value: 'MT', label: 'Montana' },
+  { value: 'NE', label: 'Nebraska' },
+  { value: 'NV', label: 'Nevada' },
+  { value: 'NH', label: 'New Hampshire' },
+  { value: 'NJ', label: 'New Jersey' },
+  { value: 'NM', label: 'New Mexico' },
+  { value: 'NY', label: 'New York' },
+  { value: 'NC', label: 'North Carolina' },
+  { value: 'ND', label: 'North Dakota' },
+  { value: 'OH', label: 'Ohio' },
+  { value: 'OK', label: 'Oklahoma' },
+  { value: 'OR', label: 'Oregon' },
+  { value: 'PA', label: 'Pennsylvania' },
+  { value: 'RI', label: 'Rhode Island' },
+  { value: 'SC', label: 'South Carolina' },
+  { value: 'SD', label: 'South Dakota' },
+  { value: 'TN', label: 'Tennessee' },
+  { value: 'TX', label: 'Texas' },
+  { value: 'UT', label: 'Utah' },
+  { value: 'VT', label: 'Vermont' },
+  { value: 'VA', label: 'Virginia' },
+  { value: 'WA', label: 'Washington' },
+  { value: 'WV', label: 'West Virginia' },
+  { value: 'WI', label: 'Wisconsin' },
+  { value: 'WY', label: 'Wyoming' }
+];
+
+// Add complete list of provinces
+const provinces = [
+  { value: 'AB', label: 'Alberta' },
+  { value: 'BC', label: 'British Columbia' },
+  { value: 'MB', label: 'Manitoba' },
+  { value: 'NB', label: 'New Brunswick' },
+  { value: 'NL', label: 'Newfoundland and Labrador' },
+  { value: 'NS', label: 'Nova Scotia' },
+  { value: 'ON', label: 'Ontario' },
+  { value: 'PE', label: 'Prince Edward Island' },
+  { value: 'QC', label: 'Quebec' },
+  { value: 'SK', label: 'Saskatchewan' },
+  { value: 'NT', label: 'Northwest Territories' },
+  { value: 'NU', label: 'Nunavut' },
+  { value: 'YT', label: 'Yukon' }
+];
 
 export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps) => {
   const navigate = useNavigate();
@@ -28,6 +127,9 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
   const methods = useForm<Employee>({
     defaultValues: initialData,
   });
+  const { searchAddress } = useAddressSearch();
+  const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -40,11 +142,10 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
           variables: { id }
         });
         
-        const employeeData = response.data?.getEmployee;
+        const employeeData = (response as GraphQLResult<any>).data?.getEmployee;
         if (!employeeData) {
           throw new Error('Employee not found');
         }
-        
         methods.reset(employeeData);
       } catch (err) {
         console.error('Error fetching employee:', err);
@@ -65,17 +166,17 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
       setError(null);
 
       if (id) {
-        // Update existing employee
+        // Remove duplicate 'id' from data using destructuring
+        const { id: _ignored, ...employeeData } = data;
         const updateInput: UpdateEmployeeInput = {
-          id,
-          ...data
+          id, // Use the id from useParams
+          ...employeeData,
         };
         await client.graphql({
           query: updateEmployee,
           variables: { input: updateInput }
         });
       } else {
-        // Create new employee
         const createInput: CreateEmployeeInput = data;
         await client.graphql({
           query: createEmployee,
@@ -93,6 +194,35 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
     } finally {
       setLoading(false);
     }
+  };
+
+  // Phone number formatting
+  const formatPhoneNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return `(${match[1]}) ${match[2]}-${match[3]}`;
+    }
+    return value;
+  };
+
+  // Address search handler
+  const handleAddressSearch = debounce(async (searchText: string) => {
+    if (searchText.length < 3) return;
+    setIsSearching(true);
+    const results = await searchAddress(searchText);
+    setAddressSuggestions(results);
+    setIsSearching(false);
+  }, 300);
+
+  // Address selection handler
+  const handleAddressSelect = (_: any, value: any) => {
+    if (!value) return;
+    
+    methods.setValue('contactInfo.address.street', `${value.address.house_number || ''} ${value.address.road || ''}`.trim());
+    methods.setValue('contactInfo.address.city', value.address.city || '');
+    methods.setValue('contactInfo.address.state', value.address.state || '');
+    methods.setValue('contactInfo.address.postalCode', value.address.postcode || '');
   };
 
   if (loading) {
@@ -116,9 +246,9 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
       <form onSubmit={methods.handleSubmit(handleSubmit)}>
         <Paper sx={{ 
           p: 3, 
-          bgcolor: 'background.paper',
+          bgcolor: '#1a1b26', // Darker background
           borderRadius: 2,
-          boxShadow: (theme) => `0 0 10px ${theme.palette.mode === 'dark' ? 'rgba(0, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+          boxShadow: (theme) => `0 0 10px ${theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)'}`,
         }}>
           <Typography variant="h6" gutterBottom sx={{ 
             color: 'text.primary',
@@ -135,15 +265,17 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 label="Employee ID"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <SelectField
                 name="employmentStatus"
-                label="Employment Status"
+                label="Employee Classification"
                 fullWidth
                 rules={validationRules.required}
                 options={employeeTableConfig.filters?.[0].options || []}
+                sx={darkFieldStyle}
               />
             </Grid>
 
@@ -154,6 +286,7 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 label="First Name"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -162,6 +295,7 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 label="Last Name"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
 
@@ -185,6 +319,7 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                   ...validationRules.required,
                   ...validationRules.email,
                 }}
+                sx={darkFieldStyle}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -193,32 +328,71 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 label="Phone"
                 fullWidth
                 rules={validationRules.phone}
+                onChange={(e) => {
+                  e.target.value = formatPhoneNumber(e.target.value);
+                }}
+                placeholder="(123) 456-7890"
+                sx={darkFieldStyle}
               />
             </Grid>
 
-            {/* Address */}
+            {/* Address Search Autocomplete */}
+            <Grid item xs={12}>
+              <Autocomplete
+                fullWidth
+                options={addressSuggestions}
+                getOptionLabel={(option) => option.display_name || ''}
+                onInputChange={(_event, value) => handleAddressSearch(value)}
+                onChange={(_event, value) => {
+                  if (value) {
+                    handleAddressSelect(value, _event);
+                  } else {
+                    handleAddressSelect(null, _event);
+                  }
+                }}
+                loading={isSearching}
+                renderInput={(params) => (
+                  <MuiTextField
+                    {...params}
+                    label="Search Address"
+                    sx={darkFieldStyle}
+                  />
+                )}
+              />
+            </Grid>
+
+            {/* Address Fields */}
             <Grid item xs={12}>
               <ValidationTextField
                 name="contactInfo.address.street"
                 label="Street Address"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
+
             <Grid item xs={12} md={6}>
               <ValidationTextField
                 name="contactInfo.address.city"
                 label="City"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
+
             <Grid item xs={12} md={6}>
-              <ValidationTextField
+              <SelectField
                 name="contactInfo.address.state"
                 label="Province/State"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
+                options={[
+                  ...provinces.map(p => ({ value: p.value, label: p.label })),
+                  ...states.map(s => ({ value: s.value, label: s.label }))
+                ]}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -227,6 +401,7 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 label="Postal Code"
                 fullWidth
                 rules={validationRules.postalCode}
+                sx={darkFieldStyle}
               />
             </Grid>
 
@@ -246,6 +421,7 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 label="Department"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -254,6 +430,7 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 label="Position"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
 
@@ -265,15 +442,21 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <ValidationTextField
                 name="employmentDetails.regularHours"
                 label="Weekly Hours"
-                type="number"
                 fullWidth
+                type="text"
+                inputProps={{
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*'
+                }}
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
 
@@ -283,6 +466,7 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 label="Supervisor"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -291,6 +475,7 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 label="Job Classification"
                 fullWidth
                 rules={validationRules.required}
+                sx={darkFieldStyle}
               />
             </Grid>
 
@@ -309,6 +494,7 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
                 name="policyDetails.policyNumber"
                 label="Policy Number"
                 fullWidth
+                sx={darkFieldStyle}
               />
             </Grid>
           </Grid>
@@ -333,4 +519,12 @@ export const EmployeeProfile = ({ initialData, onSubmit }: EmployeeProfileProps)
       </form>
     </FormProvider>
   );
-}; 
+};
+function useAddressSearch(): { searchAddress: any; } {
+  throw new Error('Function not implemented.');
+}
+
+function debounce(_arg0: (searchText: string) => Promise<void>, _arg1: number) {
+  throw new Error('Function not implemented.');
+}
+

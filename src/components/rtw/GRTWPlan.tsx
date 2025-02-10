@@ -1,20 +1,25 @@
-import { Grid, Paper, Typography, Button, Box } from '@mui/material';
-import { ValidationTextField } from '../../common/FormValidation/ValidationTextField';
+import { Grid, Paper, Typography, Button, Box, LinearProgress } from '@mui/material';
+import { ValidationTextField } from '../common/FormValidation/ValidationTextField';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useForm, FormProvider } from 'react-hook-form';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PreviewIcon from '@mui/icons-material/Preview';
 import { useState } from 'react';
-import { calculateHours, validateTimeRange } from '../../../utils/timeCalculations';
+import { calculateHours } from '../../utils/timeCalculations';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useMediaQuery, Theme } from '@mui/material';
-import { WeekComparison } from './WeekComparison';
-import { PreviewDialog } from './PreviewDialog';
+import { WeekComparison } from './GRTWPlan/WeekComparison';
+import { PreviewDialog } from './GRTWPlan/PreviewDialog';
+// @ts-ignore
 import { useTranslation } from 'react-i18next';
+// @ts-ignore
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { DraggableWeek } from './DraggableWeek';
-import { ProgressTimeline } from './ProgressTimeline';
+import { DraggableWeek } from './GRTWPlan/DraggableWeek';
+import { ProgressTimeline } from './GRTWPlan/ProgressTimeline';
+import { PlanSummary } from './GRTWPlan/PlanSummary';
+import { WeeklyHoursBreakdown } from './GRTWPlan/WeeklyHoursBreakdown';
 
 interface DaySchedule {
   day: string;
@@ -23,7 +28,7 @@ interface DaySchedule {
   hoursWorked: number;
 }
 
-interface WeekPlan {
+export interface WeekPlan {
   weekNumber: number;
   schedule: DaySchedule[];
   restrictions: string[];
@@ -39,36 +44,22 @@ const defaultWeekSchedule: DaySchedule[] = [
   { day: 'Friday', startTime: '', endTime: '', hoursWorked: 0 },
 ];
 
+// Define allowed form fields
+interface GRTWPlanFormValues {
+  supervisorName: string;
+  approvalDate: string;
+  startDate: string;
+  endDate: string;
+  // add other fields as needed
+}
+
 export const GRTWPlan = () => {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const [previewOpen, setPreviewOpen] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
-  const methods = useForm({
-    defaultValues: {
-      // ... existing defaults ...
-    },
-    resolver: yupResolver(
-      yup.object().shape({
-        // Validation schema for each week
-        ...weeks.reduce((acc, week) => ({
-          ...acc,
-          ...week.schedule.reduce((dayAcc, day) => ({
-            ...dayAcc,
-            [`week${week.weekNumber}_${day.day}_start`]: yup.string().required('Start time required'),
-            [`week${week.weekNumber}_${day.day}_end`]: yup.string()
-              .required('End time required')
-              .test('is-after-start', 'End time must be after start time', function(value) {
-                const startTime = this.parent[`week${week.weekNumber}_${day.day}_start`];
-                return validateTimeRange(startTime, value);
-              }),
-          }), {})
-        }), {})
-      })
-    )
-  });
-
+  // Define weeks state before initializing the form since it's used in the schema
   const [weeks, setWeeks] = useState<WeekPlan[]>([{
     weekNumber: 1,
     schedule: defaultWeekSchedule,
@@ -77,9 +68,28 @@ export const GRTWPlan = () => {
     duties: ''
   }]);
 
+  // Initialize the form with our typed values
+  const methods = useForm<GRTWPlanFormValues>({
+    defaultValues: {
+      supervisorName: '',
+      approvalDate: '',
+      startDate: '',
+      endDate: '',
+    },
+    resolver: yupResolver<GRTWPlanFormValues>(
+      yup.object().shape({
+        supervisorName: yup.string().required(t('supervisorNameRequired')),
+        approvalDate: yup.string().required(t('approvalDateRequired')),
+        startDate: yup.string().required(t('startDateRequired')),
+        endDate: yup.string().required(t('endDateRequired')),
+        // Add other fields as needed
+      })
+    )
+  });
+
   const addWeek = () => {
     const nextWeek = weeks.length + 1;
-    setWeeks([...weeks, { 
+    setWeeks([...weeks, {
       weekNumber: nextWeek,
       schedule: defaultWeekSchedule,
       restrictions: [],
@@ -108,9 +118,7 @@ export const GRTWPlan = () => {
   };
 
   const calculateWeeklyHours = (weekSchedule: DaySchedule[]): number => {
-    return weekSchedule.reduce((total, day) => {
-      return total + calculateHours(day.startTime, day.endTime);
-    }, 0);
+    return weekSchedule.reduce((total, day) => total + calculateHours(day.startTime, day.endTime), 0);
   };
 
   const onDragEnd = (result: any) => {
@@ -132,13 +140,15 @@ export const GRTWPlan = () => {
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: isMobile ? 2 : 3 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between',
-          mb: 3,
-          flexWrap: 'wrap',
-          gap: 1
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            mb: 3,
+            flexWrap: 'wrap',
+            gap: 1
+          }}
+        >
           <Typography variant="h6">
             {t('grtw.title')}
           </Typography>
@@ -166,20 +176,20 @@ export const GRTWPlan = () => {
           <Grid item xs={12} md={6}>
             <DatePicker
               label="GRTW Start Date"
-              onChange={() => {}}
+              onChange={() => { }}
               sx={{ width: '100%' }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <DatePicker
               label="Expected Full RTW Date"
-              onChange={() => {}}
+              onChange={() => { }}
               sx={{ width: '100%' }}
             />
           </Grid>
-          
+
           {showComparison && (
-            <WeekComparison 
+            <WeekComparison
               weeks={weeks}
               regularHours={40}
             />
@@ -189,21 +199,26 @@ export const GRTWPlan = () => {
           <Grid container spacing={isMobile ? 2 : 3}>
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable droppableId="weeks">
-                {(provided) => (
+                {(provided: any) => (
                   <div {...provided.droppableProps} ref={provided.innerRef}>
                     {weeks.map((week, index) => (
-                      <DraggableWeek 
-                        key={week.weekNumber} 
-                        week={week} 
+                      <DraggableWeek
+                        key={week.weekNumber}
+                        week={week}
                         index={index}
                       >
-                        <Paper 
-                          sx={{ 
+                        <Paper
+                          sx={{
                             p: isMobile ? 2 : 3,
                             bgcolor: 'background.default'
                           }}
                         >
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                          <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            mb: 2
+                          }}>
                             <Typography variant="subtitle1">
                               Week {week.weekNumber}
                             </Typography>
@@ -230,12 +245,7 @@ export const GRTWPlan = () => {
                             </Box>
                           </Box>
 
-                          {/* Weekly Summary */}
-                          <WeeklyScheduleView 
-                            week={week}
-                            totalTargetHours={40}
-                          />
-
+                          {/* Daily Schedule */}
                           {/* Daily Schedule */}
                           <Typography variant="subtitle2" sx={{ mt: 3, mb: 2 }}>
                             Daily Schedule
@@ -278,7 +288,6 @@ export const GRTWPlan = () => {
                             </Grid>
                           )}
 
-                          {/* Restrictions & Limitations */}
                           <Typography variant="subtitle2" sx={{ mt: 3, mb: 2 }}>
                             Restrictions & Limitations
                           </Typography>
@@ -291,7 +300,6 @@ export const GRTWPlan = () => {
                             aria-label={`Restrictions for week ${week.weekNumber}`}
                           />
 
-                          {/* Special Instructions */}
                           <Typography variant="subtitle2" sx={{ mt: 3, mb: 2 }}>
                             Special Instructions
                           </Typography>
@@ -304,7 +312,6 @@ export const GRTWPlan = () => {
                             aria-label={`Special instructions for week ${week.weekNumber}`}
                           />
 
-                          {/* Modified Duties */}
                           <Typography variant="subtitle2" sx={{ mt: 3, mb: 2 }}>
                             Modified Duties
                           </Typography>
@@ -316,11 +323,10 @@ export const GRTWPlan = () => {
                             rows={2}
                             aria-label={`Modified duties for week ${week.weekNumber}`}
                           />
-
                           <WeeklyHoursBreakdown
                             week={week}
                             regularHours={40}
-                            showProgress
+                            showProgress={true}
                           />
                         </Paper>
                       </DraggableWeek>
@@ -363,7 +369,7 @@ export const GRTWPlan = () => {
                 <Grid item xs={12} md={6}>
                   <DatePicker
                     label="Approval Date"
-                    onChange={() => {}}
+                    onChange={() => { }}
                     sx={{ width: '100%' }}
                   />
                 </Grid>
@@ -382,27 +388,39 @@ export const GRTWPlan = () => {
 
           {/* Progress Tracker */}
           <Grid item xs={12}>
-            <ProgressTracker
-              currentWeek={weeks.length}
-              totalWeeks={6}  // or dynamic based on plan
-              targetHours={40}
-              currentHours={calculateWeeklyHours(weeks[weeks.length - 1].schedule)}
-            />
+            <div>
+              <Typography variant="h6">Progress</Typography>
+              <LinearProgress 
+                variant="determinate"
+                value={(weeks.length / 6) * 100}
+                sx={{ height: 10, borderRadius: 5, mt: 1 }}
+              />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                <Typography variant="caption">
+                  Week {weeks.length} of 6
+                </Typography>
+                <Typography variant="caption">
+                  {calculateWeeklyHours(weeks[weeks.length - 1].schedule)} / 40 hours
+                </Typography>
+              </Box>
+            </div>
           </Grid>
 
           {/* Plan Summary */}
           <Grid item xs={12}>
             <PlanSummary
-              weeks={weeks}
-              startDate={methods.getValues('startDate')}
-              endDate={methods.getValues('endDate')}
+              data={{
+                weeks,
+                startDate: methods.getValues('startDate'),
+                endDate: methods.getValues('endDate')
+              }}
             />
           </Grid>
 
           {/* Progress Timeline */}
           <Grid item xs={12}>
             <ProgressTimeline
-              weeks={weeks.map(week => ({
+              data={weeks.map(week => ({
                 week: week.weekNumber,
                 hours: calculateWeeklyHours(week.schedule),
                 targetHours: 40,
@@ -431,4 +449,4 @@ export const GRTWPlan = () => {
       </Paper>
     </FormProvider>
   );
-}; 
+};

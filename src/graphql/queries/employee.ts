@@ -1,5 +1,3 @@
-import { graphql } from 'aws-amplify/api';
-
 export const getEmployee = /* GraphQL */ `
   query GetEmployee($id: ID!) {
     getEmployee(id: $id) {

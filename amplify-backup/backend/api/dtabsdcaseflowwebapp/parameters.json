@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "dtabsdcaseflowwebapp",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authdtabsdcaseflowwebapped63b9d6",
+      "Outputs.UserPoolId"
+    ]
+  }
+}
