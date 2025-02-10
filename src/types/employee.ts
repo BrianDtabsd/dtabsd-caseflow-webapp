@@ -1,5 +1,3 @@
-import { Address } from "cluster";
-
 export type EmploymentStatus = 
   | 'regular'
   | 'casual' 
@@ -41,6 +39,6 @@ export const employeeColumns = [
     field: 'regularHours', 
     headerName: 'Weekly Hours', 
     width: 130,
-    valueFormatter: (params: { value: any; }) => `${params.value} hrs`
+    valueFormatter: (params) => `${params.value} hrs`
   },
 ]; 

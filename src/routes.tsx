@@ -5,8 +5,8 @@ import DashboardPage from './pages/dashboard/DashboardPage';
 import AssistantPage from './pages/assistant/AssistantPage';
 import { EmployeeProfile } from './components/profiles/EmployeeProfile';
 import { CorrespondencePage } from './pages/correspondence/CorrespondencePage';
+import { AuthForm } from './components/auth/AuthForm';
 import { useAuth } from './context/auth/AuthContext';
-import { LoginPage } from './pages/auth/LoginPage';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -30,13 +30,13 @@ const AppRoutes = () => {
       <Route path="/login" element={
         isAuthenticated ? 
           <Navigate to="/dashboard" replace /> : 
-          <LoginPage />
-        } />
+          <AuthForm />
+      } />
       
       <Route
         element={
           <ProtectedRoute>
-            <MainLayout children={undefined} />
+            <MainLayout />
           </ProtectedRoute>
         }
       >

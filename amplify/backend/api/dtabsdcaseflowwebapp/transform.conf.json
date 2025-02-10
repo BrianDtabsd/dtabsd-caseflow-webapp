@@ -1,6 +1,4 @@
 {
     "Version": 5,
     "ElasticsearchWarning": true
-    "ElasticsearchWarning": true,
-    "ResolverConfig": {}
 }

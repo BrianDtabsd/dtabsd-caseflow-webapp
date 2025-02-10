@@ -38,3 +38,50 @@ export const listTodos = /* GraphQL */ `query ListTodos(
   }
 }
 ` as GeneratedQuery<APITypes.ListTodosQueryVariables, APITypes.ListTodosQuery>;
+
+export const listFollowUpsWithDetails = /* GraphQL */ `
+  query ListFollowUpsWithDetails(
+    $filter: ModelFollowUpFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listFollowUps(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        type
+        reason
+        description
+        dueDate
+        status
+        priority
+        assignedTo
+        reassignedTo
+        reassignedReason
+        notes
+        sequence
+        sequenceTotal
+        isLastInSequence
+        color
+        displayOrder
+        createdAt
+        completedAt
+        case {
+          id
+          caseNumber
+          title
+          type
+          status
+          priority
+          employer {
+            name
+          }
+          caseManager {
+            firstName
+            lastName
+          }
+        }
+      }
+      nextToken
+    }
+  }
+`;
