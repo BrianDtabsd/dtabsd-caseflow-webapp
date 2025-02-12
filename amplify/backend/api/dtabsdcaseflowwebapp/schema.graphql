@@ -1,8 +1,8 @@
-# This "input" configures a global authorization rule to enable public access to
-# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
-input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+# This schema uses Cognito User Pools for authentication
+# Remove the public access rule and update with proper authentication
+# input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
 
-type Case @model @auth(rules: [{ allow: private }]) {
+type Case @model @auth(rules: [{ allow: private, provider: userPools }]) {
   id: ID!
   caseNumber: String!
   title: String!
@@ -39,7 +39,7 @@ type Case @model @auth(rules: [{ allow: private }]) {
   customFields: AWSJSON
 }
 
-type Client @model @auth(rules: [{ allow: private }]) {
+type Client @model @auth(rules: [{ allow: private, provider: userPools }]) {
   id: ID!
   firstName: String!
   lastName: String!

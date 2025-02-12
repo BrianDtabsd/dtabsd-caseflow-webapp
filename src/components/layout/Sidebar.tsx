@@ -1,3 +1,5 @@
+// src/components/layout/Sidebar.tsx
+
 import {
   Drawer,
   List,
@@ -19,6 +21,8 @@ import {
   Settings,
   SmartToy,
 } from '@mui/icons-material';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
@@ -27,12 +31,16 @@ interface SidebarProps {
   drawerWidth: number;
 }
 
+// Extend your main menu items with the new pages
 const mainMenuItems = [
   { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
   { text: 'Cases', icon: <Description />, path: '/cases' },
   { text: 'Clients', icon: <People />, path: '/clients' },
   { text: 'Tasks', icon: <Assignment />, path: '/tasks' },
   { text: 'Reports', icon: <Assessment />, path: '/reports' },
+  { text: '+ New Employee', icon: <PersonAddIcon />, path: '/employees/new' },
+  { text: 'Correspondence', icon: <MailOutlineIcon />, path: '/correspondence' },
+  { text: 'Edit Employee (Example)', icon: <People />, path: '/employees/1' },
 ];
 
 const bottomMenuItems = [
@@ -46,6 +54,7 @@ export const Sidebar = ({ isOpen, onClose, drawerWidth }: SidebarProps) => {
 
   const handleNavigation = (path: string) => {
     navigate(path);
+    onClose(); // close the drawer after navigation if needed
   };
 
   const MenuListItem = ({ item }: { item: { text: string; icon: JSX.Element; path: string } }) => (
@@ -55,42 +64,47 @@ export const Sidebar = ({ isOpen, onClose, drawerWidth }: SidebarProps) => {
         onClick={() => handleNavigation(item.path)}
         sx={{
           '&.Mui-selected': {
-            backgroundColor: theme.palette.mode === 'dark'
-              ? 'rgba(255, 121, 198, 0.1)'
-              : 'rgba(16, 185, 129, 0.1)',
+            backgroundColor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 121, 198, 0.1)'
+                : 'rgba(16, 185, 129, 0.1)',
             '&:hover': {
-              backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255, 121, 198, 0.2)'
-                : 'rgba(16, 185, 129, 0.2)',
+              backgroundColor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 121, 198, 0.2)'
+                  : 'rgba(16, 185, 129, 0.2)',
             },
           },
           '&:hover': {
-            backgroundColor: theme.palette.mode === 'dark'
-              ? 'rgba(255, 121, 198, 0.1)'
-              : 'rgba(16, 185, 129, 0.1)',
+            backgroundColor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 121, 198, 0.1)'
+                : 'rgba(16, 185, 129, 0.1)',
           },
         }}
       >
         <ListItemIcon
           sx={{
-            color: location.pathname === item.path
-              ? theme.palette.mode === 'dark'
-                ? '#ff79c6'
-                : '#10B981'
-              : 'inherit',
+            color:
+              location.pathname === item.path
+                ? theme.palette.mode === 'dark'
+                  ? '#ff79c6'
+                  : '#10B981'
+                : 'inherit',
           }}
         >
           {item.icon}
         </ListItemIcon>
-        <ListItemText 
+        <ListItemText
           primary={item.text}
           sx={{
             '& .MuiListItemText-primary': {
-              color: location.pathname === item.path
-                ? theme.palette.mode === 'dark'
-                  ? '#ff79c6'
-                  : '#10B981'
-                : theme.palette.text.primary,
+              color:
+                location.pathname === item.path
+                  ? theme.palette.mode === 'dark'
+                    ? '#ff79c6'
+                    : '#10B981'
+                  : theme.palette.text.primary,
             },
           }}
         />
@@ -113,12 +127,14 @@ export const Sidebar = ({ isOpen, onClose, drawerWidth }: SidebarProps) => {
       }}
       open={isOpen}
     >
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: '100%',
-        mt: 8,
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          mt: 8,
+        }}
+      >
         {/* Main navigation items */}
         <List>
           {mainMenuItems.map((item) => (
@@ -126,7 +142,7 @@ export const Sidebar = ({ isOpen, onClose, drawerWidth }: SidebarProps) => {
           ))}
         </List>
 
-        {/* AI Assistant section */}
+        {/* CAISEY (Assistant) section */}
         <Box sx={{ p: 2 }}>
           <Divider />
           <Box
@@ -135,13 +151,15 @@ export const Sidebar = ({ isOpen, onClose, drawerWidth }: SidebarProps) => {
               p: 2,
               borderRadius: 2,
               cursor: 'pointer',
-              backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255, 121, 198, 0.1)'
-                : 'rgba(16, 185, 129, 0.1)',
+              backgroundColor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 121, 198, 0.1)'
+                  : 'rgba(16, 185, 129, 0.1)',
               '&:hover': {
-                backgroundColor: theme.palette.mode === 'dark'
-                  ? 'rgba(255, 121, 198, 0.2)'
-                  : 'rgba(16, 185, 129, 0.2)',
+                backgroundColor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 121, 198, 0.2)'
+                    : 'rgba(16, 185, 129, 0.2)',
               },
             }}
             onClick={() => handleNavigation('/assistant')}
@@ -159,7 +177,7 @@ export const Sidebar = ({ isOpen, onClose, drawerWidth }: SidebarProps) => {
                   fontWeight: 500,
                 }}
               >
-                AI Assistant
+                CAISEY
               </Typography>
             </Box>
             <Typography
@@ -170,7 +188,7 @@ export const Sidebar = ({ isOpen, onClose, drawerWidth }: SidebarProps) => {
                 fontSize: '0.875rem',
               }}
             >
-              Get help with cases, documents, and more
+              Your virtual assistant
             </Typography>
           </Box>
         </Box>
@@ -187,4 +205,4 @@ export const Sidebar = ({ isOpen, onClose, drawerWidth }: SidebarProps) => {
       </Box>
     </Drawer>
   );
-}; 
+};

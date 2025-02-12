@@ -1,14 +1,14 @@
-import { Address } from "../address";
+import { Address } from "cluster";
 
 export type EmploymentStatus = 
   | 'regular'
-  | 'casual'
+  | 'casual' 
   | 'temporary'
   | 'lay-off'
   | 'terminated'
   | 'retired';
 
-export interface Employee {
+export interface EmployeesPage {
   id: string;
   firstName: string;
   lastName: string;

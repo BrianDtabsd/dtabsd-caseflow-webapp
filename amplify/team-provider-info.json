@@ -16,5 +16,13 @@
         "dtabsdcaseflowwebapp": {}
       }
     }
+  },
+  "dev": {
+    "awscloudformation": {},
+    "categories": {
+      "auth": {
+        "dtabsdcaseflowwebappauth": {}
+      }
+    }
   }
 }
