@@ -1,1 +1,0 @@
-{"authSelections":"identityPoolAndUserPool","resourceName":"dtabsdcaseflowwebappauth","serviceType":"imported","region":"us-east-2","authProvidersUserPool":[],"requiredAttributes":[],"passwordPolicyMinLength":8,"passwordPolicyCharacters":[],"mfaConfiguration":"OFF","mfaTypes":["SMS"],"verificationMechanisms":["EMAIL"]}

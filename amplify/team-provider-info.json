@@ -14,6 +14,21 @@
     "categories": {
       "api": {
         "dtabsdcaseflowwebapp": {}
+      },
+      "auth": {
+        "dtabsdcaseflowwebappauth": {
+          "userPoolId": "us-east-2_UDGejoFmx",
+          "userPoolName": "amplifyAuthUserPool4BA7F805-auAcXMT9eLhT",
+          "webClientId": "2s5823tljaor4idbf3se8re34v",
+          "nativeClientId": "2s5823tljaor4idbf3se8re34v",
+          "identityPoolId": "us-east-2:81ec9983-798b-4ffd-8af0-f10544c3a6e8",
+          "identityPoolName": "amplifyAuthIdentityPool3FDE84CC_hDFpXELoACfI",
+          "allowUnauthenticatedIdentities": true,
+          "authRoleArn": "arn:aws:iam::108782054200:role/amplify-caseflowamplify-b-amplifyAuthauthenticatedU-bJQ3dEevpJxm",
+          "authRoleName": "amplify-caseflowamplify-b-amplifyAuthauthenticatedU-bJQ3dEevpJxm",
+          "unauthRoleArn": "arn:aws:iam::108782054200:role/amplify-caseflowamplify-b-amplifyAuthunauthenticate-nGR699SYQMZA",
+          "unauthRoleName": "amplify-caseflowamplify-b-amplifyAuthunauthenticate-nGR699SYQMZA"
+        }
       }
     }
   },

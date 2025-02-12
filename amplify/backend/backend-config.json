@@ -1,23 +1,20 @@
 {
   "api": {
     "dtabsdcaseflowwebapp": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "UserPoolId"
-          ],
-          "category": "auth",
-          "resourceName": "dtabsdcaseflowwebappauth"
-        }
-      ],
+      "dependsOn": [],
       "output": {
         "authConfig": {
-          "additionalAuthenticationProviders": [],
-          "defaultAuthentication": {
-            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
-            "userPoolConfig": {
-              "userPoolId": "us-east-2_fVZXoTuLW"
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AWS_IAM"
             }
+          ],
+          "defaultAuthentication": {
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 30,
+              "description": "api key description"
+            },
+            "authenticationType": "API_KEY"
           }
         }
       },
@@ -25,12 +22,94 @@
       "service": "AppSync"
     }
   },
-  "auth": {
-    "dtabsdcaseflowwebappauth": {
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "Cognito",
-      "serviceType": "imported"
+  "parameters": {
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_allowUnauthenticatedIdentities": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_authRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_authRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_identityPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_identityPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_unauthRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_unauthRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dtabsdcaseflowwebappauth_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dtabsdcaseflowwebappauth"
+        }
+      ]
     }
   }
 }
